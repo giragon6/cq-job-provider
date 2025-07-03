@@ -9,6 +9,7 @@ app = FastAPI()
 
 redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
 redis_client = redis.from_url(redis_url, decode_responses=True)
+print(redis_url)
 
 def make_cache_key(params: dict) -> str:
   key = json.dumps(params, sort_keys=True)
