@@ -15,6 +15,10 @@ def make_cache_key(params: dict) -> str:
   key = json.dumps(params, sort_keys=True)
   return "jobs:" + hashlib.sha256(key.encode()).hexdigest()
 
+@app.get("/")
+async def root():
+  return {"status": "up"}
+
 @app.get("/jobs/")
 async def get_jobs(
   site_name: str | list[str] | Site | list[Site] | None = None,
