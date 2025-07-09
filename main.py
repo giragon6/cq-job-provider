@@ -9,7 +9,6 @@ app = FastAPI()
 
 redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
 redis_client = redis.from_url(redis_url, decode_responses=True)
-print(redis_url)
 
 def make_cache_key(params: dict) -> str:
   key = json.dumps(params, sort_keys=True)
@@ -70,6 +69,11 @@ async def get_jobs(
         cached_jobs,
         media_type="application/json",
       )
+    params = {k: v for k, v in params.items() if v is not None}
+    if isinstance(site_name, str):
+      params["site_name"] = Site[site_name]
+    elif isinstance(site_name, list):
+      params["site_name"] = [Site[s] if isinstance(s, str) else s for s in site_name]
     jobs_df = scrape_jobs(**params)
     jobs_res = jobs_df.to_json(orient="records")
     await redis_client.set(cache_key, jobs_res, ex=3600)
